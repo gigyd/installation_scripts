@@ -1,0 +1,184 @@
+ssh -i "Tiruriru.pem" ubuntu@ec2-3-91-19-41.compute-1.amazonaws.com
+
+Username:ubuntu
+MainServer  18.205.155.0    (main  172.31.83.233)
+TestServer  44.202.105.239  (main 172.31.82.15)
+
+
+/home/ubuntu/jenkins
+ 
+Main server jenkins  and java installed
+sudo apt-get update
+sudo apt-get install openjdk-11-jdk
+sudo apt-get install jenkins ---> New way of instation
+============================
+Old way 
+E: Package 'jenkins' has no installation candidate
+============================
+New way sudo apt-get install openjdk-8-jdk
+sudo sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+sudo apt-get update
+sudo apt-get install jenkins (2.319.2)
+pub   rsa4096 2020-03-30 [SC] [expires: 2023-03-30]
+      62A9756BFD780C377CF24BA8FCEF32E745F2C3D5
+uid                      Jenkins Project 
+sub   rsa4096 2020-03-30 [E] [expires: 2023-03-30]
+=============================
+
+
+Does not work, no GPG error when updating
+
+wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key |sudo apt-key add -
+sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+sudo apt-key adv --keyserver hkp://pool.sks-keyservers.net:80 --recv-keys 8B7D32F2D50582e6
+sudo apt-key adv --keyserver hkp://pool.sks-keyservers.net:80 --recv-keys 62A9756BFD780C377CF24BA8FCEF32E745F2C3D5
+
+Install rpm
+sudo add-apt-repository universe
+sudo apt-get update
+sudo apt-get install alien
+sudo alien packagename.rpm packaname not found
+sudo alien -i packagename.rpm same error
+instead
+sudo apt-get install alien dpkg-dev debhelper build-essential
+
+
+
+Does not work
+On an RPM-based system (Fedora, SUSE, Mandriva, RHEL, etc.), download the key and then use rpm to install it.
+
+wget https://dl.google.com/linux/linux_signing_key.pub
+sudo rpm --import linux_signing_key.pub
+You can verify the key installation by running:
+
+rpm -qi gpg-pubkey-7fac5991-*
+To manually verify an RPM package, you can run the command:
+
+rpm --checksig -v packagename.rpm
+===========================
+Proposed installation steps
+ curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo tee \
+    /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+	
+echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+    https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+    /etc/apt/sources.list.d/jenkins.list > /dev/null
+	
+	When executing  sudo apt-key adv --keyserver hkp://pool.sks-keyservers.net:80 --recv-keys 62A9756BFD780C377CF24BA8FCEF32E745F2C3D5
+	gpg: keyserver receive failed: Server indicated a failure
+==============================
+sudo systemctl start jenkins
+sudo systemctl enable jenkins
+
+Error 
+ers.net:80 --recv-keys 8B7D32F2D50582e6
+gpg: Note: '--keyserver' is not considered an option
+gpg: Note: '--recv-keys' is not considered an option
+gpg: "sudo" not a key ID: skipping
+gpg: "apt-key" not a key ID: skipping
+gpg: "adv" not a key ID: skipping
+gpg: "--keyserver" not a key ID: skipping
+gpg: "hkp://pool.sks-keyservers.net:80" not a key ID: skipping
+gpg: "--recv-keys" not a key ID: skipping
+gpg: keyserver receive failed: No name
+=================================
+Works
+gpg --keyserver keys.openpgp.org --recv-keys 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+
+output
+gpg: key 105BD0E739499BDB: "Piotr Kuczynski <piotr.kuczynski@gmail.com>" not changed
+gpg: Total number processed: 1
+gpg:              unchanged: 1
+
+=================================
+Unlock Jenkins
+/var/lib/jenkins/secrets/initialAdminPassword
+key 3b0138b144eb4993866c118aaf32ad35
+=================================
+When setting up Jenkins agent launch method launch from the master missing
+ResolutionNote that before 2.176.1 the “Launch agent by connecting it to the master” used to be known as “Launch agent via Java Web Start” and “TCP port for inbound agents” as “TCP port for JNLP agents”.The option “Launch agent by connecting it to the master” is only available if the inbound agents port is enabled (i.e. the TcpSlaveAgentListener is running).The inbound agents port can be enabled under Manage Jenkins > Configure Global Security > Agents > TCP port for inbound agents. Once enabled, the option “Launch agent by connecting it to the master” will be available in the configuration of the Jenkins Nodes.Note: It is recommended to use a Fixed agent port for better manageability.
+Port8081 enabled
+=================================
+TestServer java installed as jenkins prerequesite
+sudo apt-get install -y opejdk-8-jdk
+=================================
+Error E: Unable to locate package opejdk-8-jdk
+
+sudo apt-get-repository ppa:webupd8team/java apt-get-repository: command not found
+sudo apt-get install oracle-java8-installer E: Package 'oracle-java8-installer' has no installation candidate
+sudo apt-get install software-properties-common 
+udo apt-get install python-software-properties
+curl -s'https://get.sdkman.io" | bash
+source "$HOME/.sdkman/bin/sdkman-init.sh"
+ls -l /etc/alternatives/java*
+sudo update-java-alternatives --set java-8-oracle   update-java-alternatives: directory does not exist: /usr/lib/jvm/java-8-oracle
+sudo apt-get install software-properties-common
+======
+sudo apt-get install openjdk-8-jdk
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+openjdk-8-jdk is already the newest version (8u312-b07-0ubuntu1~18.04).
+0 upgraded, 0 newly installed, 0 to remove and 10 not upgraded.
+======
+
+==================================
+
+mkdir jenkins
+java -jar agent.jar -jnlpUrl http://18.205.155.0:8080/computer/TestServer/jenkins-agent.jnlp -secret 0d340f971a7a3331b74bcb63af9e21005a280a99ed24b32e75e0179c8eb873ee -workDir "/home/ubuntu/jenkins"
+java -jar agent.jar -jnlpUrl http://18.205.155.0:8080/computer/TestServer/jenkins-agent.jnlp -secret 7D2BAF1CF37B13E2069D6956105BD0E739499BDB -workDir "/home/ubuntu/jenkins"
+571:21 sucinst
+
+sudo git init
+sudo git clone "https://github.com/gigyd/website.git"
+sudo nano index.html
+website$ sudo git add .   adding to the staging area
+sudo git commit -m"initial commit"
+=====
+
+On branch master
+Your branch is up to date with 'origin/master'.
+
+nothing to commit, working tree clean
+=========
+Webhook in Git setup
+Add http://18.205.155.0:8080/ to webhook
+Create New Jenkins job
+sudo git push origin master (master is a branch not a server)
+===========================
+TestServer node would not work
+Exception in thread "main" java.io.IOException: The specified remoting internal directory should be fully accessible to the remoting executable (RWX): /home/ubuntu/jenkins/remoting
+        at org.jenkinsci.remoting.engine.WorkDirManager.verifyDirectory(WorkDirManager.java:249)
+        at org.jenkinsci.remoting.engine.WorkDirManager.initializeWorkDir(WorkDirManager.java:206)
+        at hudson.remoting.Launcher.run(Launcher.java:322)
+        at hudson.remoting.Launcher.main(Launcher.java:298)
+===========================================
+cd website/
+sudo git push origin master pushes update on master credentialas PAT required
+Build pushed
+/website$ sudo git branch
+/website$ sudo git branch
+
+
+=========================
+sudo apt install gdebi
+sudo gdebi add-apt-key_1.0-0.5_all.deb
+sudo gdebi resetter_2.2.3-stable_all.deb
+wget htts://github.com/gaining/Resetter/releases/download/v3.0.0-stable/resetter_3.0.0-stable_all.deb
+https://github.com/gaining/Resetter/releases/tag/v1.1.3-stable
+
+http://34.238.243.199:8080/login?from=%2F
+/var/lib/jenkins/secrets/initialAdminPassword
+http://34.238.243.199:8080/
+82184662f3c84f2fa9e74bf6b035eb0e
+
+
+https://github.com/gigyd/website.git
+
+ssh 54.197.68.83 java -jar /home/ubuntu/jenkins
+
+
+==========================
+Ports checkup
+list for open ports 
+sudo netstat -plnt
